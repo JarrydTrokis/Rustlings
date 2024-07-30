@@ -5,12 +5,12 @@ mod sausage_factory {
         String::from("Ginger")
     }
 
-    fn make_sausage() {
+    pub fn make_sausage() {
         get_secret_recipe();
         println!("sausage!");
     }
 }
 
 fn main() {
-    sausage_factory::make_sausage();
+    crate::sausage_factory::make_sausage();
 }

@@ -21,9 +21,15 @@ fn total_cost(item_quantity: &str) -> Result<i32, ParseIntError> {
     let cost_per_item = 5;
 
     // TODO: Handle the error case as described above.
-    let qty = item_quantity.parse::<i32>();
+    let qty = item_quantity.parse::<i32>()?;
 
     Ok(qty * cost_per_item + processing_fee)
+
+    // ℹ️  The code below is the initial working solution - however, there '?'
+    // operator is far more useful here.
+    //
+    // The ? operator in Rust is a powerful and convenient tool used for error handling. It simplifies the propagation of errors in functions that return a Result or Option type.
+    // The ? operator can be thought of as a shorthand for a sequence of operations that check if a Result or Option is an error or None, and if so, it returns the error or None early from the function. If the value is Ok or Some, the ? operator extracts the value inside and allows the function to continue.
 }
 
 fn main() {

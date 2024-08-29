@@ -11,7 +11,16 @@ struct PositiveNonzeroInteger(u64);
 
 impl PositiveNonzeroInteger {
     fn new(value: i64) -> Result<Self, CreationError> {
-        // TODO: This function shouldn't always return an `Ok`.
+        // ℹ️  The reason I've had to use an explict return here is
+        // because Rust expects me to return an express (just like a JS ternary),
+        // but I've added multiple statements - solutions/13_error_handling/errors4.rs
+        // uses an 'else if' so that the expression is continued
+        if value < 0 {
+            return Err(CreationError::Negative);
+        }
+        if value == 0 {
+            return Err(CreationError::Zero);
+        }
         Ok(Self(value as u64))
     }
 }

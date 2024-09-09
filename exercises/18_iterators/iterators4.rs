@@ -10,10 +10,15 @@ fn factorial(num: u64) -> u64 {
     // - additional variables
     // For an extra challenge, don't use:
     // - recursion
+
+    (1..num + 1).fold(1, |acc, x| acc * x)
+    // ℹ️  The one below was recommended by Clippy
+    // (1..num + 1).product::<u64>()
 }
 
 fn main() {
     // You can optionally experiment here.
+    factorial(4);
 }
 
 #[cfg(test)]

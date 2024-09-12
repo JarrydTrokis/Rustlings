@@ -23,27 +23,74 @@ enum IntoColorError {
     IntConversion,
 }
 
-// TODO: Tuple implementation.
-// Correct RGB color values must be integers in the 0..=255 range.
+// ℹ️  Looking at the solution file, it's clear that there's a lot
+// that I need to learn about cleaning up and reusing the code. I'm
+// still very much in the stage of getting things to work and haven't
+// yet moved to making them better/good/faster.
+//
+// Looking at solution/23_conversions/try_from_into.rs, I can see that
+// the solution re-uses the TryFrom for a tuple. I didn't even think about
+// just passing a tuple to the original method.
+//
 impl TryFrom<(i16, i16, i16)> for Color {
     type Error = IntoColorError;
 
-    fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {}
+    fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
+        // this is very nearly there. I can do better here....
+        // let (red, green, blue) = tuple;
+        //
+        // Looking at this implementation -- there's a clear gap to me
+        // which is that the function doesn't do any check on whether or
+        // not the i16 is within range. Now... I'm going to have to dig into
+        // what the values of u8 *can* be.
+        //
+        // Ok ... just did some digging and it turns out that I don't really
+        // know my data types as well as I should. u8's max val is 255. Let's break
+        // it down so that I remember:
+        //
+        // u8 is unsigned 8 bit value
+        // A single bit can be 0 or 1
+        // 8 bits of 0s / 1s in binary can have a max value of 255
+        // 255 == 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1
+        // So when we try the conversion here, we save a massive amount
+        // of looping and comparison, because we don't need to check that
+        // the value is within range. The conversion checks that for us.
+        let (Ok(red), Ok(green), Ok(blue)) = (
+            u8::try_from(tuple.0),
+            u8::try_from(tuple.1),
+            u8::try_from(tuple.2),
+        ) else {
+            return Err(IntoColorError::IntConversion);
+        };
+
+        Ok(Color { red, green, blue })
+    }
 }
 
-// TODO: Array implementation.
 impl TryFrom<[i16; 3]> for Color {
     type Error = IntoColorError;
 
-    fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {}
+    fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {
+        // We can then reuse the defined function here. Now ... I'm not entirely
+        // sure how the copmiler knows that we need to use the other method. The only
+        // justification I have is that the data type we're passing in (aka the function signature)
+        // matches the Tuple implementation we have. That tells me that the impl trait is somewhat
+        // dynamic in that it takes in the function signature and knows which method to call
+        // based on the arguments. Pretty neat!
+        Self::try_from((arr[0], arr[1], arr[2]))
+    }
 }
 
-// TODO: Slice implementation.
-// This implementation needs to check the slice length.
 impl TryFrom<&[i16]> for Color {
     type Error = IntoColorError;
 
-    fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {}
+    fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {
+        if slice.len() != 3 {
+            return Err(IntoColorError::BadLen);
+        };
+
+        Self::try_from((slice[0], slice[1], slice[2]))
+    }
 }
 
 fn main() {
